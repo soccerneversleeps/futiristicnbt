@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { ArrowLeft } from "lucide-react"
 import { ConfirmationDialog } from "./confirmation-dialog"
+import { Button } from "./button"
 
 export function BackHomeButton() {
   const router = useRouter()
@@ -22,13 +23,14 @@ export function BackHomeButton() {
 
   return (
     <>
-      <button
+      <Button
         onClick={handleClick}
-        className="inline-flex items-center text-cyan-400 hover:text-cyan-300 transition-colors absolute top-6 left-6 z-20"
+        variant="outline"
+        className="fixed top-6 right-6 z-50 bg-black/40 border border-cyan-500/50 backdrop-blur-md text-cyan-400 hover:text-cyan-300 hover:border-cyan-400 hover:bg-black/60 transition-all duration-300 group"
       >
-        <ArrowLeft className="mr-2 h-5 w-5" />
+        <ArrowLeft className="mr-2 h-5 w-5 group-hover:-translate-x-1 transition-transform" />
         Back Home
-      </button>
+      </Button>
 
       <ConfirmationDialog
         isOpen={showConfirmation}

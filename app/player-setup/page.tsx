@@ -61,11 +61,6 @@ export default function PlayerSetup() {
       </div>
 
       <div className="container mx-auto px-4 py-12 relative z-10">
-        <Link href="/" className="inline-flex items-center text-cyan-400 hover:text-cyan-300 mb-8 transition-colors">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
-        </Link>
-
         <div className="max-w-4xl mx-auto">
           <Card className="bg-black/60 border border-purple-500/50 backdrop-blur-md p-8 rounded-xl">
             <h1 className="text-3xl md:text-4xl font-bold text-white mb-8 text-center">

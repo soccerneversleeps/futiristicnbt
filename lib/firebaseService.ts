@@ -11,12 +11,12 @@ import type {
 
 export interface Question {
   id: string;
-  text: string;
+  category: string;
+  question: string;
   options: string[];
   correctAnswer: string;
-  difficulty: number;
+  difficulty: number; // This will always be 1 now
   explanation: string;
-  category: string;
   createdAt: Timestamp;
   lastUsed: Timestamp | null;
   usageCount: number;
@@ -24,26 +24,26 @@ export interface Question {
 
 export interface SportDifficulty {
   label: string;
-  points: number;
+  value: number;
 }
 
 export const SPORT_DIFFICULTIES: Record<string, SportDifficulty[]> = {
   basketball: [
-    { label: '2-pointer', points: 2 },
-    { label: '3-pointer', points: 3 }
+    { label: '2-Point Shot', value: 1 },
+    { label: '3-Point Shot', value: 1 }
   ],
   football: [
-    { label: 'Field Goal', points: 3 },
-    { label: 'Touchdown', points: 7 }
+    { label: 'Field Goal', value: 1 },
+    { label: 'Touchdown', value: 1 }
   ],
   soccer: [
-    { label: 'Goal', points: 1 }
+    { label: 'Goal', value: 1 }
   ],
   baseball: [
-    { label: 'Single', points: 1 },
-    { label: 'Double', points: 2 },
-    { label: 'Triple', points: 3 },
-    { label: 'Grand Slam', points: 4 }
+    { label: 'Single', value: 1 },
+    { label: 'Double', value: 1 },
+    { label: 'Triple', value: 1 },
+    { label: 'Home Run', value: 1 }
   ]
 };
 

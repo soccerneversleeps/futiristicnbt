@@ -94,11 +94,6 @@ export default function LeaderboardPage() {
       </div>
 
       <div className="container mx-auto px-4 py-12 relative z-10">
-        <Link href="/" className="inline-flex items-center text-cyan-400 hover:text-cyan-300 mb-8 transition-colors">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Home
-        </Link>
-
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
             <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-purple-500 to-green-400 mb-4">
