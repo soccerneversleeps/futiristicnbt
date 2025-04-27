@@ -17,6 +17,8 @@ const nextConfig = {
         fs: false,
         path: false,
         child_process: false,
+        net: false,
+        tls: false,
       };
     }
     return config;

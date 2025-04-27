@@ -1,5 +1,15 @@
 {
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "framework": "nextjs"
+  "version": 2,
+  "public": true,
+  "cleanUrls": true,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/next@canary",
+      "config": {
+        "packageManager": "npm",
+        "nodeVersion": "18.x"
+      }
+    }
+  ]
 } 
