@@ -19,8 +19,6 @@ export default function GamePage() {
   const router = useRouter()
   const [playerName, setPlayerName] = useState<string>("")
   const [selectedSport, setSelectedSport] = useState<string>("")
-  const [selectedDifficulty, setSelectedDifficulty] = useState<SportDifficulty | null>(null)
-  const [isSelectingDifficulty, setIsSelectingDifficulty] = useState<boolean>(false)
   const [questions, setQuestions] = useState<Question[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0)
   const [score, setScore] = useState<number>(0)
@@ -39,26 +37,25 @@ export default function GamePage() {
 
     setPlayerName(storedName)
     setSelectedSport(storedSport)
-    setIsSelectingDifficulty(true)
-  }, [router])
-
-  useEffect(() => {
-    if (selectedDifficulty) {
-      const fetchQuestions = async () => {
-        const fetchedQuestions = await getQuestionsByCategory(selectedSport, selectedDifficulty.value)
+    
+    // Automatically fetch questions using the first difficulty option
+    const fetchQuestions = async () => {
+      const sportDifficulties = SPORT_DIFFICULTIES[storedSport]
+      if (sportDifficulties && sportDifficulties.length > 0) {
+        const fetchedQuestions = await getQuestionsByCategory(storedSport, sportDifficulties[0].value)
         if (fetchedQuestions.length === 0) {
-          router.push("/")
+          console.error("No questions available for this category")
           return
         }
         setQuestions(fetchedQuestions)
       }
-      fetchQuestions()
     }
-  }, [selectedSport, selectedDifficulty, router])
+    fetchQuestions()
+  }, [router])
 
   const handleAnswer = (isCorrect: boolean) => {
     if (isCorrect) {
-      setScore(prev => prev + 1)
+      setScore(prev => prev + 1) // Always add 1 point regardless of difficulty
     }
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1)
@@ -95,6 +92,35 @@ export default function GamePage() {
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`
   }
 
+  if (!questions.length) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black overflow-hidden relative flex items-center justify-center">
+        <BackHomeButton />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {Array.from({ length: 15 }).map((_, i) => (
+            <div
+              key={i}
+              className="absolute rounded-lg bg-gradient-to-r from-cyan-500/20 to-purple-500/20 backdrop-blur-sm"
+              style={{
+                width: `${Math.random() * 100 + 50}px`,
+                height: `${Math.random() * 100 + 50}px`,
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animation: `float ${Math.random() * 10 + 10}s linear infinite`,
+                animationDelay: `${Math.random() * 5}s`,
+                transform: `rotate(${Math.random() * 360}deg)`,
+                opacity: 0.3,
+              }}
+            />
+          ))}
+        </div>
+        <Card className="bg-black/60 border border-purple-500/50 backdrop-blur-md p-8 rounded-xl">
+          <div className="text-2xl text-white">Loading questions...</div>
+        </Card>
+      </div>
+    )
+  }
+
   const getSportIcon = () => {
     switch (selectedSport) {
       case "basketball":
@@ -108,36 +134,6 @@ export default function GamePage() {
       default:
         return "🎮"
     }
-  }
-
-  if (isSelectingDifficulty) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white p-8">
-        <h1 className="text-4xl font-bold mb-8 text-center">Select Difficulty</h1>
-        <div className="flex flex-col items-center gap-4">
-          {SPORT_DIFFICULTIES[selectedSport]?.map((difficulty) => (
-            <button
-              key={difficulty.label}
-              onClick={() => {
-                setSelectedDifficulty(difficulty)
-                setIsSelectingDifficulty(false)
-              }}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg w-64 text-lg"
-            >
-              {difficulty.label} ({difficulty.value} points)
-            </button>
-          ))}
-        </div>
-      </div>
-    )
-  }
-
-  if (!questions.length || !selectedDifficulty) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white p-8 flex items-center justify-center">
-        <div className="text-2xl">Loading questions...</div>
-      </div>
-    )
   }
 
   if (gameOver) {
