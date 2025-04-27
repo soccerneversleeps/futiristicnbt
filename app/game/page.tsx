@@ -7,7 +7,13 @@ import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Clock, Trophy, Star } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { getQuestionsByCategory, saveScore, type Question } from '@/lib/firebaseService'
+import { 
+  getQuestionsByCategory, 
+  saveScore, 
+  type Question,
+  SPORT_DIFFICULTIES,
+  type SportDifficulty 
+} from '@/lib/firebaseService'
 
 export default function GamePage() {
   const router = useRouter()
@@ -21,6 +27,9 @@ export default function GamePage() {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
   const [showFeedback, setShowFeedback] = useState<boolean>(false)
   const [gameOver, setGameOver] = useState<boolean>(false)
+  const [selectedDifficulty, setSelectedDifficulty] = useState<number | null>(null)
+  const [isSelectingDifficulty, setIsSelectingDifficulty] = useState<boolean>(true)
+  const [currentQuestionData, setCurrentQuestionData] = useState<Question | null>(null)
 
   useEffect(() => {
     const storedName = localStorage.getItem("playerName")
@@ -33,15 +42,18 @@ export default function GamePage() {
 
     setPlayerName(storedName)
     setSelectedSport(storedSport)
-
-    // Fetch questions from Firebase
-    const fetchQuestions = async () => {
-      const fetchedQuestions = await getQuestionsByCategory(storedSport);
-      setQuestions(fetchedQuestions);
-    };
-
-    fetchQuestions();
   }, [router])
+
+  // Fetch questions when difficulty is selected
+  const fetchQuestionByDifficulty = async (difficulty: number) => {
+    const fetchedQuestions = await getQuestionsByCategory(selectedSport, difficulty);
+    if (fetchedQuestions.length > 0) {
+      // Get a random question from the fetched questions
+      const randomIndex = Math.floor(Math.random() * fetchedQuestions.length);
+      setCurrentQuestionData(fetchedQuestions[randomIndex]);
+      setIsSelectingDifficulty(false);
+    }
+  };
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -56,17 +68,15 @@ export default function GamePage() {
     return () => clearInterval(timer)
   }, [timeLeft])
 
-  const currentQuestion = questions[currentQuestionIndex]
-
   const handleOptionSelect = (option: string) => {
-    if (showFeedback) return
+    if (showFeedback || !currentQuestionData) return
 
     setSelectedOption(option)
-    setIsCorrect(option === currentQuestion.correctAnswer)
+    setIsCorrect(option === currentQuestionData.correctAnswer)
     setShowFeedback(true)
 
-    if (option === currentQuestion.correctAnswer) {
-      setScore((prev) => prev + currentQuestion.difficulty)
+    if (option === currentQuestionData.correctAnswer) {
+      setScore((prev) => prev + currentQuestionData.difficulty)
     }
 
     // Move to next question after a delay
@@ -74,13 +84,9 @@ export default function GamePage() {
       setShowFeedback(false)
       setSelectedOption(null)
       setIsCorrect(null)
-
-      if (currentQuestionIndex < questions.length - 1) {
-        setCurrentQuestionIndex((prev) => prev + 1)
-      } else {
-        // If we've gone through all questions, start over
-        setCurrentQuestionIndex(0)
-      }
+      setCurrentQuestionIndex((prev) => prev + 1)
+      setIsSelectingDifficulty(true)
+      setCurrentQuestionData(null)
     }, 1500)
   }
 
@@ -116,8 +122,68 @@ export default function GamePage() {
       case "baseball":
         return "⚾"
       default:
-        return "🏆"
+        return "��"
     }
+  }
+
+  if (isSelectingDifficulty && selectedSport && !gameOver) {
+    const difficulties = SPORT_DIFFICULTIES[selectedSport] || [];
+    
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black overflow-hidden relative flex items-center justify-center">
+        <div className="container mx-auto px-4 py-6 relative z-10">
+          <div className="flex justify-between items-center mb-6">
+            <div className="bg-black/60 border border-purple-500/50 backdrop-blur-md px-4 py-2 rounded-lg">
+              <p className="text-white">
+                <span className="text-cyan-400 font-bold">{playerName}</span> | {getSportIcon()}{" "}
+                {selectedSport.charAt(0).toUpperCase() + selectedSport.slice(1)}
+              </p>
+            </div>
+
+            <div className="bg-black/60 border border-purple-500/50 backdrop-blur-md px-4 py-2 rounded-lg flex items-center">
+              <Clock className="h-5 w-5 text-cyan-400 mr-2" />
+              <span className="text-white font-mono">{formatTime(timeLeft)}</span>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <div className="flex justify-between items-center mb-1">
+              <span className="text-cyan-300">Time Remaining</span>
+              <span className="text-cyan-300">{formatTime(timeLeft)}</span>
+            </div>
+            <Progress value={(timeLeft / 180) * 100} className="h-2 bg-gray-800">
+              <div className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full"></div>
+            </Progress>
+          </div>
+
+          <Card className="bg-black/60 border border-purple-500/50 backdrop-blur-md p-8 rounded-xl max-w-md w-full mx-auto">
+            <h2 className="text-2xl font-bold text-white mb-6 text-center">Select Question Type</h2>
+            <div className="grid gap-4">
+              {difficulties.map((diff: SportDifficulty) => (
+                <Button
+                  key={diff.points}
+                  onClick={() => fetchQuestionByDifficulty(diff.points)}
+                  className={`h-16 text-lg ${
+                    selectedSport === 'basketball' ? (
+                      diff.points === 2 ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'
+                    ) : selectedSport === 'football' ? (
+                      diff.points === 3 ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-red-600 hover:bg-red-700'
+                    ) : selectedSport === 'baseball' ? (
+                      diff.points === 1 ? 'bg-green-600 hover:bg-green-700' :
+                      diff.points === 2 ? 'bg-yellow-600 hover:bg-yellow-700' :
+                      diff.points === 3 ? 'bg-orange-600 hover:bg-orange-700' :
+                      'bg-red-600 hover:bg-red-700'
+                    ) : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
+                >
+                  {diff.label} - {diff.points} {diff.points === 1 ? 'point' : 'points'}
+                </Button>
+              ))}
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
   }
 
   if (gameOver) {
@@ -179,7 +245,7 @@ export default function GamePage() {
     )
   }
 
-  if (!currentQuestion) {
+  if (!currentQuestionData) {
     return <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>
   }
 
@@ -213,32 +279,30 @@ export default function GamePage() {
             </p>
           </div>
 
-          <div className="bg-black/60 border border-purple-500/50 backdrop-blur-md px-4 py-2 rounded-lg flex items-center">
-            <Clock className="h-5 w-5 text-cyan-400 mr-2" />
-            <span className="text-white font-mono">{formatTime(timeLeft)}</span>
+          <div className="bg-black/60 border border-green-500/50 backdrop-blur-md px-4 py-2 rounded-lg flex items-center">
+            <Star className="h-5 w-5 text-green-400 mr-2" />
+            <span className="text-white font-bold">{score} points</span>
           </div>
         </div>
 
         <div className="mb-4">
           <div className="flex justify-between items-center mb-1">
             <span className="text-cyan-300">Time Remaining</span>
-            <span className="text-cyan-300">{Math.floor((timeLeft / 180) * 100)}%</span>
+            <Clock className="h-5 w-5 text-cyan-400" />
           </div>
           <Progress value={(timeLeft / 180) * 100} className="h-2 bg-gray-800">
             <div className="h-full bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full"></div>
           </Progress>
+          <div className="text-right mt-1">
+            <span className="text-cyan-300 font-mono">{formatTime(timeLeft)}</span>
+          </div>
         </div>
 
         <div className="flex justify-between items-center mb-6">
           <div className="bg-black/60 border border-cyan-500/50 backdrop-blur-md px-4 py-2 rounded-lg">
             <p className="text-white">
-              Question {currentQuestionIndex + 1} of {questions.length}
+              Question {currentQuestionIndex + 1}
             </p>
-          </div>
-
-          <div className="bg-black/60 border border-green-500/50 backdrop-blur-md px-4 py-2 rounded-lg flex items-center">
-            <Star className="h-5 w-5 text-green-400 mr-2" />
-            <span className="text-white font-bold">{score} points</span>
           </div>
         </div>
 
@@ -246,14 +310,14 @@ export default function GamePage() {
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cyan-500 to-purple-500"></div>
 
           <div className="mb-6">
-            <h2 className="text-2xl font-bold text-white mb-4">{currentQuestion.text}</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">{currentQuestionData.text}</h2>
             <div className="text-sm text-cyan-300 mb-1">
-              Worth: <span className="font-bold">{currentQuestion.difficulty} points</span>
+              Worth: <span className="font-bold">{currentQuestionData.difficulty} points</span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {currentQuestion.options.map((option, index) => (
+            {currentQuestionData.options.map((option, index) => (
               <AnimatePresence key={`${currentQuestionIndex}-${index}`}>
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
