@@ -5,9 +5,16 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowLeft, Trophy, Medal, Award } from "lucide-react"
+import { BackHomeButton } from "@/components/ui/back-home-button"
+
+interface LeaderboardEntry {
+  name: string
+  score: number
+  sport: string
+}
 
 export default function LeaderboardPage() {
-  const [leaderboard, setLeaderboard] = useState([])
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
 
   useEffect(() => {
     // In a real app, we would fetch this from an API
@@ -15,7 +22,7 @@ export default function LeaderboardPage() {
 
     // If empty, add some mock data
     if (storedLeaderboard.length === 0) {
-      const mockLeaderboard = [
+      const mockLeaderboard: LeaderboardEntry[] = [
         { name: "SpaceJam23", score: 87, sport: "basketball" },
         { name: "GoalMaster", score: 76, sport: "soccer" },
         { name: "TouchdownKing", score: 72, sport: "football" },
@@ -34,7 +41,7 @@ export default function LeaderboardPage() {
     }
   }, [])
 
-  const getSportIcon = (sport) => {
+  const getSportIcon = (sport: string): string => {
     switch (sport) {
       case "basketball":
         return "🏀"
@@ -49,7 +56,7 @@ export default function LeaderboardPage() {
     }
   }
 
-  const getRankIcon = (rank) => {
+  const getRankIcon = (rank: number) => {
     switch (rank) {
       case 0:
         return <Trophy className="h-6 w-6 text-yellow-400" />
@@ -66,6 +73,7 @@ export default function LeaderboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black overflow-hidden relative">
+      <BackHomeButton />
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {Array.from({ length: 15 }).map((_, i) => (
           <div

@@ -14,6 +14,7 @@ import {
   SPORT_DIFFICULTIES,
   type SportDifficulty 
 } from '@/lib/firebaseService'
+import { BackHomeButton } from "@/components/ui/back-home-button"
 
 export default function GamePage() {
   const router = useRouter()
@@ -131,6 +132,7 @@ export default function GamePage() {
     
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black overflow-hidden relative flex items-center justify-center">
+        <BackHomeButton />
         <div className="container mx-auto px-4 py-6 relative z-10">
           <div className="flex justify-between items-center mb-6">
             <div className="bg-black/60 border border-purple-500/50 backdrop-blur-md px-4 py-2 rounded-lg">
@@ -189,6 +191,7 @@ export default function GamePage() {
   if (gameOver) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black overflow-hidden relative flex items-center justify-center">
+        <BackHomeButton />
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {Array.from({ length: 20 }).map((_, i) => (
             <div
@@ -246,11 +249,17 @@ export default function GamePage() {
   }
 
   if (!currentQuestionData) {
-    return <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center text-white">
+        <BackHomeButton />
+        Loading...
+      </div>
+    )
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black overflow-hidden relative">
+      <BackHomeButton />
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {Array.from({ length: 15 }).map((_, i) => (
           <div

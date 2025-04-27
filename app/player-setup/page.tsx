@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
 import { ArrowRight, ArrowLeft } from "lucide-react"
 import Link from "next/link"
+import { BackHomeButton } from "@/components/ui/back-home-button"
 
 export default function PlayerSetup() {
   const router = useRouter()
@@ -38,6 +39,7 @@ export default function PlayerSetup() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black via-purple-950 to-black overflow-hidden relative">
+      <BackHomeButton />
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {Array.from({ length: 15 }).map((_, i) => (
