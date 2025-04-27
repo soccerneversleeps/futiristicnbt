@@ -1,5 +1,5 @@
 import { db } from './firebase';
-import { collection, getDocs, query, where, Timestamp } from 'firebase/firestore';
+import { collection, getDocs, query, where, Timestamp, addDoc } from 'firebase/firestore';
 
 export interface Question {
   id: string;
