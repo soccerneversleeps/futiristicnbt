@@ -1,19 +1,18 @@
 'use client';
 
-import { getApps, initializeApp } from 'firebase/app';
+import { initializeApp, getApps } from 'firebase/app';
 import { Analytics, getAnalytics } from 'firebase/analytics';
 import { Firestore, getFirestore } from 'firebase/firestore';
 
-// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyBVad0qcojBUpwySAek4ihN1kcTP0_qEN4",
+  authDomain: "nothingbuttrivia-68640.firebaseapp.com",
+  databaseURL: "https://nothingbuttrivia-68640-default-rtdb.firebaseio.com",
+  projectId: "nothingbuttrivia-68640",
+  storageBucket: "nothingbuttrivia-68640.firebasestorage.app",
+  messagingSenderId: "648467137933",
+  appId: "1:648467137933:web:936a64647cdf31b3d2a9c4",
+  measurementId: "G-X6PR0VSKTE"
 };
 
 // Initialize Firebase
@@ -26,14 +25,10 @@ if (typeof window !== 'undefined') {
   db = getFirestore(app);
   // Initialize Analytics only in production and on the client side
   if (process.env.NODE_ENV === 'production') {
-    import('firebase/analytics').then(() => {
-      analytics = getAnalytics(app);
-    }).catch((error) => {
-      console.error('Error loading analytics:', error);
-    });
+    analytics = getAnalytics(app);
   }
 } else {
   db = getFirestore(app);
 }
 
-export { db, analytics }; 
+export { app, analytics, db }; 
