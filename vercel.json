@@ -5,11 +5,15 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/next@canary",
+      "use": "@vercel/next",
       "config": {
-        "packageManager": "npm",
-        "nodeVersion": "18.x"
+        "nodeVersion": "18.x",
+        "installCommand": "npm install",
+        "buildCommand": "npm run build"
       }
     }
-  ]
+  ],
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs"
 } 

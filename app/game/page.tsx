@@ -7,20 +7,20 @@ import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Clock, Trophy, Star } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { getQuestionsByCategory, saveScore } from '@/lib/firebaseService'
+import { getQuestionsByCategory, saveScore, type Question } from '@/lib/firebaseService'
 
 export default function GamePage() {
   const router = useRouter()
-  const [playerName, setPlayerName] = useState("")
-  const [selectedSport, setSelectedSport] = useState("")
-  const [questions, setQuestions] = useState([])
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  const [score, setScore] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(180) // 3 minutes in seconds
-  const [selectedOption, setSelectedOption] = useState(null)
-  const [isCorrect, setIsCorrect] = useState(null)
-  const [showFeedback, setShowFeedback] = useState(false)
-  const [gameOver, setGameOver] = useState(false)
+  const [playerName, setPlayerName] = useState<string>("")
+  const [selectedSport, setSelectedSport] = useState<string>("")
+  const [questions, setQuestions] = useState<Question[]>([])
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0)
+  const [score, setScore] = useState<number>(0)
+  const [timeLeft, setTimeLeft] = useState<number>(180) // 3 minutes in seconds
+  const [selectedOption, setSelectedOption] = useState<string | null>(null)
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null)
+  const [showFeedback, setShowFeedback] = useState<boolean>(false)
+  const [gameOver, setGameOver] = useState<boolean>(false)
 
   useEffect(() => {
     const storedName = localStorage.getItem("playerName")
@@ -58,7 +58,7 @@ export default function GamePage() {
 
   const currentQuestion = questions[currentQuestionIndex]
 
-  const handleOptionSelect = (option) => {
+  const handleOptionSelect = (option: string) => {
     if (showFeedback) return
 
     setSelectedOption(option)
@@ -99,7 +99,7 @@ export default function GamePage() {
     localStorage.setItem("leaderboard", JSON.stringify(newLeaderboard))
   }
 
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
     return `${mins}:${secs < 10 ? "0" : ""}${secs}`
