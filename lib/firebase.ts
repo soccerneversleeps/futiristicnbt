@@ -1,6 +1,8 @@
-import { initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getAnalytics, isSupported } from 'firebase/analytics';
+'use client';
+
+import { getApps, initializeApp } from 'firebase/app';
+import { Analytics, getAnalytics } from 'firebase/analytics';
+import { Firestore, getFirestore } from 'firebase/firestore';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -15,18 +17,23 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+let app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+let analytics: Analytics | null = null;
+let db: Firestore;
 
-// Initialize Analytics and handle server-side rendering
-let analytics = null;
+// Only initialize Firestore and Analytics on the client side
 if (typeof window !== 'undefined') {
-  // Only initialize analytics on the client side
-  isSupported().then(supported => {
-    if (supported) {
+  db = getFirestore(app);
+  // Initialize Analytics only in production and on the client side
+  if (process.env.NODE_ENV === 'production') {
+    import('firebase/analytics').then(() => {
       analytics = getAnalytics(app);
-    }
-  });
+    }).catch((error) => {
+      console.error('Error loading analytics:', error);
+    });
+  }
+} else {
+  db = getFirestore(app);
 }
 
 export { db, analytics }; 

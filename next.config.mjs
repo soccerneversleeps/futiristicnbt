@@ -21,6 +21,16 @@ const nextConfig = {
         tls: false,
       };
     }
+
+    // Ensure proper module resolution
+    config.resolve.extensions = ['.ts', '.tsx', '.js', '.jsx', '.json'];
+    
+    // Add support for ESM modules
+    config.experiments = {
+      ...config.experiments,
+      topLevelAwait: true,
+    };
+
     return config;
   },
 }

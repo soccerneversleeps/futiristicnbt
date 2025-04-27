@@ -1,5 +1,13 @@
+'use client';
+
 import { db } from './firebase';
-import { collection, getDocs, query, where, Timestamp, addDoc } from 'firebase/firestore';
+import type { 
+  CollectionReference,
+  DocumentData,
+  Query,
+  QuerySnapshot,
+  Timestamp
+} from 'firebase/firestore';
 
 export interface Question {
   id: string;
@@ -16,9 +24,12 @@ export interface Question {
 
 export const getQuestionsByCategory = async (category: string): Promise<Question[]> => {
   try {
-    const questionsRef = collection(db, 'preloaded_questions');
-    const q = query(questionsRef, where('category', '==', category));
-    const querySnapshot = await getDocs(q);
+    // Dynamically import Firestore functions
+    const { collection, getDocs, query, where } = await import('firebase/firestore');
+    
+    const questionsRef = collection(db, 'preloaded_questions') as CollectionReference<DocumentData>;
+    const q = query(questionsRef, where('category', '==', category)) as Query<DocumentData>;
+    const querySnapshot = await getDocs(q) as QuerySnapshot<DocumentData>;
     
     return querySnapshot.docs.map(doc => ({
       id: doc.id,
@@ -32,6 +43,9 @@ export const getQuestionsByCategory = async (category: string): Promise<Question
 
 export const saveScore = async (playerName: string, score: number, sport: string) => {
   try {
+    // Dynamically import Firestore functions
+    const { collection, addDoc } = await import('firebase/firestore');
+    
     const scoresRef = collection(db, 'scores');
     await addDoc(scoresRef, {
       playerName,
